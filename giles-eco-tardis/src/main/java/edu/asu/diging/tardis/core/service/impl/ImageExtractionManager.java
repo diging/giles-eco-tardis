@@ -2,6 +2,7 @@ package edu.asu.diging.tardis.core.service.impl;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -89,9 +90,8 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
      * .IImageExtractionRequest)
      */
     @Override
-    public void extractImages(ICompletedStorageRequest request) throws IOException, InterruptedException {
+    public void extractImages(ICompletedStorageRequest request) {
         logger.info("Extracting images for: " + request.getDownloadPath());
-        
         
         BufferedImage imageFile = null;
         RequestStatus status = RequestStatus.COMPLETE;
@@ -103,8 +103,40 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             status = RequestStatus.FAILED;
         }
         ImageProcessor processor = new ImageProcessor(fileStorageManager, request);
-        String imagePath = processor.saveImageFile(imageFile, request);
-        innogenScriptRunner.runInnogenScript(imagePath);
+        String imagePath;
+        try {
+            imagePath = processor.saveImageFile(imageFile, request);
+            innogenScriptRunner.runInnogenScript(imagePath, request.getUsername(), request.getDocumentId(), request.getUploadId());
+        } catch (IOException e) {
+            messageHandler.handleMessage("Could execute docker command for " + request.getDownloadPath(), e, MessageType.ERROR);
+        }
+        
+        File outputDirectory = new File(propertiesManager.getProperty(Properties.BASE_DIRECTORY) + File.separator + "extracted" + File.separator + 
+                request.getUsername() + File.separator + request.getUploadId() + File.separator + request.getDocumentId());
+        File[] files = outputDirectory.listFiles();
+        String restEndpoint = getRestEndpoint();
+        edu.asu.diging.gilesecosystem.requests.impl.Page requestPage = new edu.asu.diging.gilesecosystem.requests.impl.Page();
+        requestPage.setPageElements(new ArrayList<>());
+        for (File file : files) {
+            PageElement pageElem = new PageElement();
+            pageElem.setContentType("image/png");
+            pageElem.setFilename(file.getName());
+            pageElem.setType("IMAGE");
+            pageElem.setDownloadUrl(
+                  restEndpoint + DownloadFileController.GET_FILE_URL
+                          .replace(
+                                  DownloadFileController.REQUEST_ID_PLACEHOLDER,
+                                  request.getRequestId())
+                          .replace(
+                                  DownloadFileController.DOCUMENT_ID_PLACEHOLDER,
+                                  request.getDocumentId())
+                          .replace(DownloadFileController.FILENAME_PLACEHOLDER,
+                                  file.getName()));
+            pageElem.setStatus(PageStatus.COMPLETE);
+            requestPage.getPageElements().add(pageElem);
+        }
+        
+        
 //        List<edu.asu.diging.gilesecosystem.requests.impl.Page> pages = new ArrayList<>();
 //        if (pdfDocument != null) {
 //            

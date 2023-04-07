@@ -14,7 +14,7 @@ public class ImageProcessor {
     private String dirFolder;
     
     public ImageProcessor(IFileStorageManager storageManager, ICompletedStorageRequest request) {
-        dirFolder = storageManager.getAndCreateStoragePath(request.getRequestId(), request.getDocumentId(), null);
+        dirFolder = storageManager.getAndCreateStoragePath(request.getUsername(), request.getUploadId(), request.getDocumentId());
     }
     
     protected String saveImageFile(BufferedImage imageFile, ICompletedStorageRequest request) throws IOException {

@@ -13,6 +13,6 @@ public interface IImageExtractionManager {
      * IImageExtractionManager #extractImages(edu.asu.diging.gilesecosystem.requests
      * .IImageExtractionRequest)
      */
-    void extractImages(ICompletedStorageRequest request) throws IOException, InterruptedException;
+    void extractImages(ICompletedStorageRequest request);
 
 }
