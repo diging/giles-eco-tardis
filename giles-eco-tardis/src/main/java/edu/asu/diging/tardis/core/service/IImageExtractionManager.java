@@ -1,5 +1,7 @@
 package edu.asu.diging.tardis.core.service;
 
+import java.io.IOException;
+
 import edu.asu.diging.gilesecosystem.requests.ICompletedStorageRequest;
 
 public interface IImageExtractionManager {
@@ -11,6 +13,6 @@ public interface IImageExtractionManager {
      * IImageExtractionManager #extractImages(edu.asu.diging.gilesecosystem.requests
      * .IImageExtractionRequest)
      */
-    void extractImages(ICompletedStorageRequest request);
+    void extractImages(ICompletedStorageRequest request) throws IOException, InterruptedException;
 
 }

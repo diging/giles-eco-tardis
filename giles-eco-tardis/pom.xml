@@ -28,9 +28,10 @@
         <db.user>apps</db.user>
         <db.password>apps</db.password>
         <db.dialect>org.hibernate.dialect.MySQL57Dialect</db.dialect>
-        <app.url>http://localhost:8090/tardis</app.url>
-        <files.base.directory>/Users/jdamerow/Software/GilesEcosystem/giles-eco-tardis/data</files.base.directory>
+        <app.url>http://localhost:8088/tardis</app.url>
+        <files.base.directory>/Users/diyabiju/Desktop/Dig/giles-eco-tardis/data</files.base.directory>
         <file.folder>files</file.folder>
+        <giles.file.images.dir>/Users/diyabiju/Desktop/Dig/Giles/uploaded</giles.file.images.dir>
         
         <kafka.hosts>localhost:9092</kafka.hosts>
 
@@ -295,7 +296,11 @@
             <version>2.13.3</version>
         </dependency>
 
-
+		<dependency>
+    		<groupId>com.github.docker-java</groupId>
+    		<artifactId>docker-java</artifactId>
+    		<version>3.2.10</version>
+		</dependency>
     </dependencies>
 
     <build>

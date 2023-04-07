@@ -1,5 +1,6 @@
 package edu.asu.diging.tardis.core.service.impl;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
