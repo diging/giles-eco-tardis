@@ -12,10 +12,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,8 +111,10 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
                 request.getUsername() + File.separator + request.getUploadId() + File.separator + request.getDocumentId());
         File[] files = outputDirectory.listFiles();
         String restEndpoint = getRestEndpoint();
+        List<edu.asu.diging.gilesecosystem.requests.impl.Page> pages = new ArrayList<>();
         edu.asu.diging.gilesecosystem.requests.impl.Page requestPage = new edu.asu.diging.gilesecosystem.requests.impl.Page();
         requestPage.setPageElements(new ArrayList<>());
+        requestPage.setPageNr(request.getPageNr());
         for (File file : files) {
             PageElement pageElem = new PageElement();
             pageElem.setContentType("image/png");
@@ -135,91 +133,30 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             pageElem.setStatus(PageStatus.COMPLETE);
             requestPage.getPageElements().add(pageElem);
         }
-        
-        
-//        List<edu.asu.diging.gilesecosystem.requests.impl.Page> pages = new ArrayList<>();
-//        if (pdfDocument != null) {
-//            
-//            
-//            int numPages = pdfDocument.getNumberOfPages();
-//            
-//            String restEndpoint = getRestEndpoint();
-//
-//            for (int i = 0; i < numPages; i++) {
-//                edu.asu.diging.gilesecosystem.requests.impl.Page requestPage = new edu.asu.diging.gilesecosystem.requests.impl.Page();
-//                requestPage.setPageNr(i);
-//                requestPage.setPageElements(new ArrayList<>());
-//
-//                try {
-//                    PDPage page = pdfDocument.getPage(i);
-//                    
-//                    // saves images in page to filesystem
-//                    processor.processPage(page);
-//                    
-//                    
-//                    for (String filename : processor.getImageFilenames()) {
-//                        PageElement pageElem = new PageElement();
-//                        pageElem.setContentType("image/png");
-//                        pageElem.setFilename(filename);
-//                        pageElem.setType("IMAGE");
-//                        pageElem.setDownloadUrl(
-//                                restEndpoint + DownloadFileController.GET_FILE_URL
-//                                        .replace(
-//                                                DownloadFileController.REQUEST_ID_PLACEHOLDER,
-//                                                request.getRequestId())
-//                                        .replace(
-//                                                DownloadFileController.DOCUMENT_ID_PLACEHOLDER,
-//                                                request.getDocumentId())
-//                                        .replace(DownloadFileController.FILENAME_PLACEHOLDER,
-//                                                filename));
-//                        pageElem.setStatus(PageStatus.COMPLETE);
-//                        requestPage.getPageElements().add(pageElem);
-//                    }
-//                    
-//                } catch (IOException | RuntimeException e) {
-//                    messageHandler.handleMessage("Could not render image.", e, MessageType.ERROR);
-//                    requestPage.setStatus(PageStatus.FAILED);
-//                    requestPage.setErrorMsg(e.getMessage());
-//                }
-//
-//                // this needs to be reset for every page
-//                processor.resetFilenames();
-//                pages.add(requestPage);
-//            }
-//            
-//            try {
-//                pdfDocument.close();
-//            } catch (IOException e) {
-//                messageHandler.handleMessage("Error closing document.", e, MessageType.ERROR);
-//            }
-//        }
-//
-//        progressManager.setPhase(ProgressPhase.WIND_DOWN);
-//        ICompletionNotificationRequest completedRequest = null;
-//        try {
-//            completedRequest = requestFactory.createRequest(request.getRequestId(), request.getUploadId());
-//        } catch (InstantiationException | IllegalAccessException e) {
-//            messageHandler.handleMessage("Could not create request.", e, MessageType.ERROR);
-//            // this should never happen if used correctly
-//        }
-//
-//        completedRequest.setDocumentId(request.getDocumentId());
-//        completedRequest.setFileId(request.getFileId());
-//        completedRequest.setNotifier(propertiesManager.getProperty(Properties.NOTIFIER_ID));
-//        completedRequest.setStatus(status);
-//        completedRequest.setExtractionDate(OffsetDateTime.now(ZoneId.of("UTC")).toString());
-//        completedRequest.setPages(pages);
-//
-//        progressManager.setPhase(ProgressPhase.DONE);
-//        try {
-//            requestProducer.sendRequest(completedRequest,
-//                    propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
-//        } catch (MessageCreationException e) {
-//            messageHandler.handleMessage("Could not send message.", e, MessageType.ERROR);
-//        }
-//        
-//        progressManager.reset();
-    }
+        pages.add(requestPage);
+        progressManager.setPhase(ProgressPhase.WIND_DOWN);
+        ICompletionNotificationRequest completedRequest = null;
+        try {
+          completedRequest = requestFactory.createRequest(request.getRequestId(), request.getUploadId());
+        } catch (InstantiationException | IllegalAccessException e) {
+          messageHandler.handleMessage("Could not create request.", e, MessageType.ERROR);
+          // this should never happen if used correctly
+        }
 
-    
+        completedRequest.setDocumentId(request.getDocumentId());
+        completedRequest.setFileId(request.getFileId());
+        completedRequest.setNotifier(propertiesManager.getProperty(Properties.NOTIFIER_ID));
+        completedRequest.setStatus(status);
+        completedRequest.setExtractionDate(OffsetDateTime.now(ZoneId.of("UTC")).toString());
+        completedRequest.setPages(pages);
+        progressManager.setPhase(ProgressPhase.DONE);
+        try {
+          requestProducer.sendRequest(completedRequest,
+                  propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
+        } catch (MessageCreationException e) {
+          messageHandler.handleMessage("Could not send message.", e, MessageType.ERROR);
+        }
+      
+        progressManager.reset();
+    }
 }
