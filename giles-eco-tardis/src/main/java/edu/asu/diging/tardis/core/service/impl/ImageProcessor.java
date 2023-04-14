@@ -18,7 +18,7 @@ public class ImageProcessor {
     }
     
     protected String saveImageFile(BufferedImage imageFile, ICompletedStorageRequest request) throws IOException {
-        String filename = request.getFilename() + "_" + request.getFileId();
+        String filename = request.getFilename();
         File file = new File(dirFolder + File.separator + filename);
         ImageIO.write(imageFile,"PNG", file);
 

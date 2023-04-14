@@ -33,6 +33,9 @@ public class PersistenceConfig {
     @Bean(destroyMethod = "close")
     public DataSource dataSource() {
         HikariConfig dataSourceConfig = new HikariConfig();
+        System.out.println(env.getRequiredProperty("db.url"));
+        System.out.println(env.getRequiredProperty("db.username"));
+        System.out.println(env.getRequiredProperty("db.password"));
         dataSourceConfig.setDriverClassName(env.getRequiredProperty("db.driver"));
         dataSourceConfig.setJdbcUrl(env.getRequiredProperty("db.url"));
         dataSourceConfig.setUsername(env.getRequiredProperty("db.username"));

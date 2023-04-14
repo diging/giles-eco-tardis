@@ -27,9 +27,9 @@ public class InnogenScriptRunner implements IInnogenScriptRunner{
     
     @Override
     public void runInnogenScript(String imagePath, String userName, String documentId, String uploadId) {
-        String outputDirectory = createOutputDirectoryForImage(userName, documentId, uploadId);
-        String dockerCommand = "docker run --mount type=bind,source=\"$(pwd)\",target=" + propertiesManager.getProperty(Properties.BASE_DIRECTORY) + 
-                "extract_imgs -f " + imagePath + " -o " + outputDirectory;
+        String outputDirectory = getOutputDirectoryForImage(userName, documentId, uploadId);
+        String dockerCommand = "docker run --mount type=bind,source=" + propertiesManager.getProperty(Properties.BASE_DIRECTORY)+",target=/data extract_imgs -f " + imagePath.substring(imagePath.indexOf("/data")) + " -o " + outputDirectory;
+        System.out.println(dockerCommand);
         try {
             Process process = Runtime.getRuntime().exec(dockerCommand);
             process.waitFor();
@@ -38,14 +38,14 @@ public class InnogenScriptRunner implements IInnogenScriptRunner{
         }
     }
     
-    private String createOutputDirectoryForImage(String userName, String documentId, String uploadId) {
-        String path = propertiesManager.getProperty(Properties.BASE_DIRECTORY) + File.separator + "extracted" + File.separator + 
+    private String getOutputDirectoryForImage(String userName, String documentId, String uploadId) {
+        String path = "/extracted" + File.separator + 
                 userName + File.separator + uploadId + File.separator + documentId;
-        File dirFile = new File(path);
+        File dirFile = new File(Properties.BASE_DIRECTORY+path);
         if (!dirFile.exists()) {
             dirFile.mkdirs();
         }
-        return path;
+        return "/data" + path;
     }
 
 }
