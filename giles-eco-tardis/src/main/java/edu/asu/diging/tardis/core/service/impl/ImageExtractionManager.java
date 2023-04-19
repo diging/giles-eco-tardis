@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -99,64 +101,64 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             status = RequestStatus.FAILED;
         }
         ImageProcessor processor = new ImageProcessor(fileStorageManager, request);
-        String imagePath;
+        String imagePath, outputParentFolderPath;
         try {
             imagePath = processor.saveImageFile(imageFile, request);
             innogenScriptRunner.runInnogenScript(imagePath, request.getUsername(), request.getDocumentId(), request.getUploadId());
+            Path path = Paths.get(imagePath);
+            outputParentFolderPath = path.getParent().toString() + "/extracted/extracted";
+            File outputDirectory = new File(outputParentFolderPath);
+            File[] files = outputDirectory.listFiles();
+            String restEndpoint = getRestEndpoint();
+            List<edu.asu.diging.gilesecosystem.requests.impl.Page> pages = new ArrayList<>();
+            edu.asu.diging.gilesecosystem.requests.impl.Page requestPage = new edu.asu.diging.gilesecosystem.requests.impl.Page();
+            requestPage.setPageElements(new ArrayList<>());
+            requestPage.setPageNr(request.getPageNr());
+            for (File file : files) {
+                PageElement pageElem = new PageElement();
+                pageElem.setContentType("image/png");
+                pageElem.setFilename(file.getName());
+                pageElem.setType("IMAGE");
+                pageElem.setDownloadUrl(
+                      restEndpoint + DownloadFileController.GET_FILE_URL
+                              .replace(
+                                      DownloadFileController.REQUEST_ID_PLACEHOLDER,
+                                      request.getRequestId())
+                              .replace(
+                                      DownloadFileController.DOCUMENT_ID_PLACEHOLDER,
+                                      request.getDocumentId())
+                              .replace(DownloadFileController.FILENAME_PLACEHOLDER,
+                                      file.getName()));
+                pageElem.setStatus(PageStatus.COMPLETE);
+                requestPage.getPageElements().add(pageElem);
+            }
+            pages.add(requestPage);
+            progressManager.setPhase(ProgressPhase.WIND_DOWN);
+            ICompletionNotificationRequest completedRequest = null;
+            try {
+              completedRequest = requestFactory.createRequest(request.getRequestId(), request.getUploadId());
+            } catch (InstantiationException | IllegalAccessException e) {
+              messageHandler.handleMessage("Could not create request.", e, MessageType.ERROR);
+              // this should never happen if used correctly
+            }
+
+            completedRequest.setDocumentId(request.getDocumentId());
+            completedRequest.setFileId(request.getFileId());
+            completedRequest.setNotifier(propertiesManager.getProperty(Properties.NOTIFIER_ID));
+            completedRequest.setStatus(status);
+            completedRequest.setExtractionDate(OffsetDateTime.now(ZoneId.of("UTC")).toString());
+            completedRequest.setPages(pages);
+            progressManager.setPhase(ProgressPhase.DONE);
+            try {
+              requestProducer.sendRequest(completedRequest,
+                      propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
+            } catch (MessageCreationException e) {
+              messageHandler.handleMessage("Could not send message.", e, MessageType.ERROR);
+            }
+          
+            progressManager.reset();
         } catch (IOException e) {
             messageHandler.handleMessage("Could execute docker command for " + request.getDownloadPath(), e, MessageType.ERROR);
         }
-        
-        File outputDirectory = new File(propertiesManager.getProperty(Properties.BASE_DIRECTORY) + File.separator + "extracted" + File.separator + 
-                request.getUsername() + File.separator + request.getUploadId() + File.separator + request.getDocumentId());
-        File[] files = outputDirectory.listFiles();
-        String restEndpoint = getRestEndpoint();
-        List<edu.asu.diging.gilesecosystem.requests.impl.Page> pages = new ArrayList<>();
-        edu.asu.diging.gilesecosystem.requests.impl.Page requestPage = new edu.asu.diging.gilesecosystem.requests.impl.Page();
-        requestPage.setPageElements(new ArrayList<>());
-        requestPage.setPageNr(request.getPageNr());
-        for (File file : files) {
-            PageElement pageElem = new PageElement();
-            pageElem.setContentType("image/png");
-            pageElem.setFilename(file.getName());
-            pageElem.setType("IMAGE");
-            pageElem.setDownloadUrl(
-                  restEndpoint + DownloadFileController.GET_FILE_URL
-                          .replace(
-                                  DownloadFileController.REQUEST_ID_PLACEHOLDER,
-                                  request.getRequestId())
-                          .replace(
-                                  DownloadFileController.DOCUMENT_ID_PLACEHOLDER,
-                                  request.getDocumentId())
-                          .replace(DownloadFileController.FILENAME_PLACEHOLDER,
-                                  file.getName()));
-            pageElem.setStatus(PageStatus.COMPLETE);
-            requestPage.getPageElements().add(pageElem);
-        }
-        pages.add(requestPage);
-        progressManager.setPhase(ProgressPhase.WIND_DOWN);
-        ICompletionNotificationRequest completedRequest = null;
-        try {
-          completedRequest = requestFactory.createRequest(request.getRequestId(), request.getUploadId());
-        } catch (InstantiationException | IllegalAccessException e) {
-          messageHandler.handleMessage("Could not create request.", e, MessageType.ERROR);
-          // this should never happen if used correctly
-        }
-
-        completedRequest.setDocumentId(request.getDocumentId());
-        completedRequest.setFileId(request.getFileId());
-        completedRequest.setNotifier(propertiesManager.getProperty(Properties.NOTIFIER_ID));
-        completedRequest.setStatus(status);
-        completedRequest.setExtractionDate(OffsetDateTime.now(ZoneId.of("UTC")).toString());
-        completedRequest.setPages(pages);
-        progressManager.setPhase(ProgressPhase.DONE);
-        try {
-          requestProducer.sendRequest(completedRequest,
-                  propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
-        } catch (MessageCreationException e) {
-          messageHandler.handleMessage("Could not send message.", e, MessageType.ERROR);
-        }
-      
-        progressManager.reset();
     }
 }

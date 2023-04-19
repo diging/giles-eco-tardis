@@ -27,8 +27,13 @@ public class InnogenScriptRunner implements IInnogenScriptRunner{
     
     @Override
     public void runInnogenScript(String imagePath, String userName, String documentId, String uploadId) {
-        String outputDirectory = getOutputDirectoryForImage(userName, documentId, uploadId);
-        String dockerCommand = "/usr/local/bin/docker run --mount type=bind,source=" + propertiesManager.getProperty(Properties.BASE_DIRECTORY)+",target=/data extract_imgs -f " + imagePath.substring(imagePath.indexOf("/data")) + " -o " + outputDirectory;
+        Path path = Paths.get(imagePath);
+        String outputParentFolderPath = path.getParent().toString();
+        String outputDirectory = getOutputDirectoryForImage(outputParentFolderPath);
+        
+        String dockerCommand = propertiesManager.getProperty(Properties.DOCKER_PATH) + " run --mount type=bind,source=" + propertiesManager.getProperty(Properties.BASE_DIRECTORY)+",target=/data extract_imgs -f " + imagePath.substring(imagePath.indexOf("/data")).toString() + " -o " + outputDirectory;
+        System.out.println(imagePath);
+        System.out.println(outputDirectory);
         System.out.println(dockerCommand);
         try {
             Process process = Runtime.getRuntime().exec(dockerCommand);
@@ -38,13 +43,13 @@ public class InnogenScriptRunner implements IInnogenScriptRunner{
         }
     }
     
-    private String getOutputDirectoryForImage(String userName, String documentId, String uploadId) {
-        String path = File.separator + userName + File.separator + uploadId + File.separator + documentId + "/extracted";
-        File dirFile = new File(propertiesManager.getProperty(Properties.BASE_DIRECTORY)+path);
+    private String getOutputDirectoryForImage(String outputParentFolderPath) {
+        String path =  outputParentFolderPath + "/extracted";
+        File dirFile = new File(path);
         if (!dirFile.exists()) {
             dirFile.mkdirs();
         }
-        return "/data" + path;
+        return path.substring(path.indexOf("/data"));
     }
 
 }

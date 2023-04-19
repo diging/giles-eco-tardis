@@ -32,4 +32,5 @@ public interface Properties {
     
     public final static String GILES_IMAGES_DIRECTORY = "giles.file.images.dir";
     public final static String BASE_DIRECTORY = "base_directory";
+    public final static String DOCKER_PATH = "docker_path";
 }
