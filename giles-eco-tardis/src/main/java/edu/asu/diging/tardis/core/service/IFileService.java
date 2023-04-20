@@ -6,9 +6,8 @@ public interface IFileService {
 
     String getStoragePath(ICompletedStorageRequest request);
 
-    byte[] getFileContent(String requestId, String documentId, String filename);
+    byte[] getFileContent(String userName, String uploadId, String documentId, String filename);
 
-    void deleteFile(String requestId, String documentId, String filename);
-
+    void deleteFile(String userName, String uploadId, String documentId, String filename);
 
 }

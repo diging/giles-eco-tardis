@@ -29,13 +29,13 @@ public class FileService implements IFileService {
     }
     
     @Override
-    public byte[] getFileContent(String requestId, String documentId, String filename) {
-        return fileStorageManager.getFileContent(requestId, documentId, null, filename);
+    public byte[] getFileContent(String userName, String uploadId, String documentId, String filename) {
+        return fileStorageManager.getExtractedFileContent(userName, uploadId, documentId, filename);
     }
     
     @Override
-    public void deleteFile(String requestId, String documentId, String filename) {
-        fileStorageManager.deleteFile(requestId, documentId, null, filename, true);
+    public void deleteFile(String userName, String uploadId, String documentId, String filename) {
+        fileStorageManager.deleteFile(userName, uploadId, documentId, filename, true);
     }
     
 }

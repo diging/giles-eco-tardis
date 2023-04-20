@@ -122,8 +122,11 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
                 pageElem.setDownloadUrl(
                       restEndpoint + DownloadFileController.GET_FILE_URL
                               .replace(
-                                      DownloadFileController.REQUEST_ID_PLACEHOLDER,
-                                      request.getRequestId())
+                                      DownloadFileController.USER_NAME_PLACEHOLDER,
+                                      request.getUsername())
+                              .replace(
+                                      DownloadFileController.UPLOAD_ID_PLACEHOLDER,
+                                      request.getUploadId())
                               .replace(
                                       DownloadFileController.DOCUMENT_ID_PLACEHOLDER,
                                       request.getDocumentId())
