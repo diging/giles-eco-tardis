@@ -89,6 +89,11 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
      */
     @Override
     public void extractImages(ICompletedStorageRequest request) {
+        System.out.println(request);
+        if (request.getImageExtracted()) {
+            return;
+        }
+        
         logger.info("Extracting images for: " + request.getDownloadPath());
         
         BufferedImage imageFile = null;
