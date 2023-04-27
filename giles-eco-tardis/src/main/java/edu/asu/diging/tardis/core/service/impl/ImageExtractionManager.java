@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.asu.diging.gilesecosystem.requests.FileType;
 import edu.asu.diging.gilesecosystem.requests.ICompletedStorageRequest;
 import edu.asu.diging.gilesecosystem.requests.ICompletionNotificationRequest;
 import edu.asu.diging.gilesecosystem.requests.IRequestFactory;
@@ -89,7 +90,8 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
      */
     @Override
     public void extractImages(ICompletedStorageRequest request) {
-        System.out.println(request);
+        System.out.println(request.getFilename());
+        System.out.println(request.getImageExtracted());
         if (request.getImageExtracted()) {
             return;
         }
@@ -114,6 +116,8 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             outputParentFolderPath = path.getParent().toString() + "/extracted/extracted";
             File outputDirectory = new File(outputParentFolderPath);
             File[] files = outputDirectory.listFiles();
+            System.out.println(outputDirectory);
+            System.out.println(files);
             String restEndpoint = getRestEndpoint();
             List<edu.asu.diging.gilesecosystem.requests.impl.Page> pages = new ArrayList<>();
             edu.asu.diging.gilesecosystem.requests.impl.Page requestPage = new edu.asu.diging.gilesecosystem.requests.impl.Page();
@@ -157,6 +161,7 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             completedRequest.setExtractionDate(OffsetDateTime.now(ZoneId.of("UTC")).toString());
             completedRequest.setPages(pages);
             completedRequest.setImageExtracted(true);
+            completedRequest.setContentType("image/png");
             progressManager.setPhase(ProgressPhase.DONE);
             try {
               requestProducer.sendRequest(completedRequest,

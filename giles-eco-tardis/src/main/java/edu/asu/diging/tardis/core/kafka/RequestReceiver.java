@@ -42,8 +42,9 @@ public class RequestReceiver {
         
         if (request.getFileType() == FileType.IMAGE) {
             manager.extractImages(request);
-        }
-        logger.info("File not a pdf. Skip processing.");
-        // otherwise do nothing (we only care about pdfs)
+        } else {
+            // otherwise do nothing (we only care about pdfs)
+            logger.info("File not an image. Skip processing.");
+        } 
     }
 }
