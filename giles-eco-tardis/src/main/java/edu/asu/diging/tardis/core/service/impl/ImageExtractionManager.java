@@ -111,7 +111,7 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
         String imagePath, outputParentFolderPath;
         try {
             imagePath = processor.saveImageFile(imageFile, request);
-            innogenScriptRunner.runInnogenScript(imagePath, request.getUsername(), request.getDocumentId(), request.getUploadId());
+            innogenScriptRunner.runInnogenScript(imagePath);
             Path path = Paths.get(imagePath);
             outputParentFolderPath = path.getParent().toString() + "/extracted/extracted";
             File outputDirectory = new File(outputParentFolderPath);

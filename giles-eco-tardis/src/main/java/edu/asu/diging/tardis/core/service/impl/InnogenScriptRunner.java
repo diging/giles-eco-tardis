@@ -26,12 +26,24 @@ public class InnogenScriptRunner implements IInnogenScriptRunner{
     protected IPropertiesManager propertiesManager;
     
     @Override
-    public void runInnogenScript(String imagePath, String userName, String documentId, String uploadId) {
+    public void runInnogenScript(String imagePath) {
         Path path = Paths.get(imagePath);
         String outputParentFolderPath = path.getParent().toString();
         String outputDirectory = getOutputDirectoryForImage(outputParentFolderPath);
         
-        String dockerCommand = propertiesManager.getProperty(Properties.DOCKER_PATH) + " run --mount type=bind,source=" + propertiesManager.getProperty(Properties.BASE_DIRECTORY)+",target=/data extract_imgs -f " + imagePath.substring(imagePath.indexOf("/data")).toString() + " -o " + outputDirectory;
+        //String dockerCommand = propertiesManager.getProperty(Properties.DOCKER_PATH) + " run --mount type=bind,source=" + propertiesManager.getProperty(Properties.BASE_DIRECTORY)+",target=/data extract_imgs -f " + imagePath.substring(imagePath.indexOf("/data")).toString().replaceAll(" ", "\t") + " -o " + outputDirectory;
+        //String dockerCommand = propertiesManager.getProperty(Properties.DOCKER_PATH) + " run --mount type=bind,source=\"" + propertiesManager.getProperty(Properties.BASE_DIRECTORY) + "\",target=/data extract_imgs -f \"" + imagePath.substring(imagePath.indexOf("/data")) + "\" -o \"" + outputDirectory + "\"";
+        String[] dockerCommand = new String[]{
+                propertiesManager.getProperty(Properties.DOCKER_PATH),
+                "run",
+                "--mount",
+                "type=bind,source=" + propertiesManager.getProperty(Properties.BASE_DIRECTORY) + ",target=/data",
+                "extract_imgs",
+                "-f",
+                imagePath.substring(imagePath.indexOf("/data")).toString(),
+                "-o",
+                outputDirectory
+        };
         System.out.println(imagePath);
         System.out.println(outputDirectory);
         System.out.println(dockerCommand);
