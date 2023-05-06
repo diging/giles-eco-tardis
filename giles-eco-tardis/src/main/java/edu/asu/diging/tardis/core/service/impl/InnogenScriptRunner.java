@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import edu.asu.diging.gilesecosystem.septemberutil.properties.MessageType;
@@ -26,13 +25,10 @@ public class InnogenScriptRunner implements IInnogenScriptRunner{
     protected IPropertiesManager propertiesManager;
     
     @Override
-    public void runInnogenScript(String imagePath) {
+    public void runInnogenScript(String imagePath, int pareNr) {
         Path path = Paths.get(imagePath);
         String outputParentFolderPath = path.getParent().toString();
-        String outputDirectory = getOutputDirectoryForImage(outputParentFolderPath);
-        
-        //String dockerCommand = propertiesManager.getProperty(Properties.DOCKER_PATH) + " run --mount type=bind,source=" + propertiesManager.getProperty(Properties.BASE_DIRECTORY)+",target=/data extract_imgs -f " + imagePath.substring(imagePath.indexOf("/data")).toString().replaceAll(" ", "\t") + " -o " + outputDirectory;
-        //String dockerCommand = propertiesManager.getProperty(Properties.DOCKER_PATH) + " run --mount type=bind,source=\"" + propertiesManager.getProperty(Properties.BASE_DIRECTORY) + "\",target=/data extract_imgs -f \"" + imagePath.substring(imagePath.indexOf("/data")) + "\" -o \"" + outputDirectory + "\"";
+        String outputDirectory = getOutputDirectoryForImage(outputParentFolderPath, pareNr);
         String[] dockerCommand = new String[]{
                 propertiesManager.getProperty(Properties.DOCKER_PATH),
                 "run",
@@ -44,9 +40,6 @@ public class InnogenScriptRunner implements IInnogenScriptRunner{
                 "-o",
                 outputDirectory
         };
-        System.out.println(imagePath);
-        System.out.println(outputDirectory);
-        System.out.println(dockerCommand);
         try {
             Process process = Runtime.getRuntime().exec(dockerCommand);
             process.waitFor();
@@ -55,8 +48,8 @@ public class InnogenScriptRunner implements IInnogenScriptRunner{
         }
     }
     
-    private String getOutputDirectoryForImage(String outputParentFolderPath) {
-        String path =  outputParentFolderPath + "/extracted";
+    private String getOutputDirectoryForImage(String outputParentFolderPath, int pageNr) {
+        String path =  outputParentFolderPath + "/extracted" + File.separator + pageNr;
         File dirFile = new File(path);
         if (!dirFile.exists()) {
             dirFile.mkdirs();

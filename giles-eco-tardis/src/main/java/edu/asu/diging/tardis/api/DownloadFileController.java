@@ -26,24 +26,25 @@ public class DownloadFileController {
     public final static String DOCUMENT_ID_PLACEHOLDER = "{documentId}";
     public final static String USER_NAME_PLACEHOLDER = "{userName}";
     public final static String UPLOAD_ID_PLACEHOLDER = "{uploadId}";
-    public final static String GET_FILE_URL = "/rest/image/" + USER_NAME_PLACEHOLDER + "/" + UPLOAD_ID_PLACEHOLDER + "/" + DOCUMENT_ID_PLACEHOLDER + "/" + FILENAME_PLACEHOLDER;
+    public final static String PAGE_NR = "{pageNr}";
+    public final static String GET_FILE_URL = "/rest/image/" + USER_NAME_PLACEHOLDER + "/" + UPLOAD_ID_PLACEHOLDER + "/" + DOCUMENT_ID_PLACEHOLDER + "/" + PAGE_NR + "/" + FILENAME_PLACEHOLDER;
    
     @Autowired
     private IFileService fileService;
 
     @RequestMapping(value = GET_FILE_URL)
     public ResponseEntity<String> getFile(
-            @PathVariable String filename, @PathVariable String documentId, @PathVariable String uploadId, @PathVariable String userName,
+            @PathVariable String filename, @PathVariable String documentId, @PathVariable String uploadId, @PathVariable String userName, @PathVariable int pageNr,
             HttpServletResponse response,
             HttpServletRequest request) {
 
-        byte[] content = fileService.getFileContent(userName, uploadId, documentId, filename);
+        byte[] content = fileService.getFileContent(userName, uploadId, documentId, pageNr, filename);
         
         if (content == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         
-        //fileService.deleteFile(requestId, documentId, filename);
+        fileService.deleteFile(userName, uploadId, documentId, pageNr, filename);
         
         String contentType = new Tika().detect(content);
         response.setContentType(contentType);

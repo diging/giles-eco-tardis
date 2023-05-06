@@ -111,9 +111,9 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
         String imagePath, outputParentFolderPath;
         try {
             imagePath = processor.saveImageFile(imageFile, request);
-            innogenScriptRunner.runInnogenScript(imagePath);
+            innogenScriptRunner.runInnogenScript(imagePath,request.getPageNr());
             Path path = Paths.get(imagePath);
-            outputParentFolderPath = path.getParent().toString() + "/extracted/extracted";
+            outputParentFolderPath = path.getParent().toString() + File.separator + "extracted" + File.separator + request.getPageNr() + File.separator + "extracted";
             File outputDirectory = new File(outputParentFolderPath);
             File[] files = outputDirectory.listFiles();
             System.out.println(outputDirectory);
@@ -139,6 +139,9 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
                               .replace(
                                       DownloadFileController.DOCUMENT_ID_PLACEHOLDER,
                                       request.getDocumentId())
+                              .replace(
+                                      DownloadFileController.PAGE_NR,
+                                      String.valueOf(request.getPageNr()))
                               .replace(DownloadFileController.FILENAME_PLACEHOLDER,
                                       file.getName()));
                 pageElem.setStatus(PageStatus.COMPLETE);
