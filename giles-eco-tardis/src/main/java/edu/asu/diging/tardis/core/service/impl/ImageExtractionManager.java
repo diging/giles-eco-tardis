@@ -35,6 +35,7 @@ import edu.asu.diging.gilesecosystem.util.files.IFileStorageManager;
 import edu.asu.diging.gilesecosystem.util.properties.IPropertiesManager;
 import edu.asu.diging.tardis.api.DownloadFileController;
 import edu.asu.diging.tardis.config.Properties;
+import edu.asu.diging.tardis.core.service.IFileService;
 import edu.asu.diging.tardis.core.service.IImageExtractionManager;
 import edu.asu.diging.tardis.core.service.IInnogenScriptRunner;
 import edu.asu.diging.tardis.core.service.IProgressManager;
@@ -66,7 +67,8 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
     @Autowired
     private IInnogenScriptRunner innogenScriptRunner;
     
-    
+    @Autowired
+    private IFileService fileService;
     
     @PostConstruct
     public void init() {
@@ -123,59 +125,62 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             edu.asu.diging.gilesecosystem.requests.impl.Page requestPage = new edu.asu.diging.gilesecosystem.requests.impl.Page();
             requestPage.setPageElements(new ArrayList<>());
             requestPage.setPageNr(request.getPageNr());
-            for (File file : files) {
-                PageElement pageElem = new PageElement();
-                pageElem.setContentType("image/png");
-                pageElem.setFilename(file.getName());
-                pageElem.setType("IMAGE");
-                pageElem.setDownloadUrl(
-                      restEndpoint + DownloadFileController.GET_FILE_URL
-                              .replace(
-                                      DownloadFileController.USER_NAME_PLACEHOLDER,
-                                      request.getUsername())
-                              .replace(
-                                      DownloadFileController.UPLOAD_ID_PLACEHOLDER,
-                                      request.getUploadId())
-                              .replace(
-                                      DownloadFileController.DOCUMENT_ID_PLACEHOLDER,
-                                      request.getDocumentId())
-                              .replace(
-                                      DownloadFileController.PAGE_NR,
-                                      String.valueOf(request.getPageNr()))
-                              .replace(DownloadFileController.FILENAME_PLACEHOLDER,
-                                      file.getName()));
-                pageElem.setStatus(PageStatus.COMPLETE);
-                requestPage.getPageElements().add(pageElem);
-            }
-            pages.add(requestPage);
-            progressManager.setPhase(ProgressPhase.WIND_DOWN);
-            ICompletionNotificationRequest completedRequest = null;
-            try {
-              completedRequest = requestFactory.createRequest(request.getRequestId(), request.getUploadId());
-            } catch (InstantiationException | IllegalAccessException e) {
-              messageHandler.handleMessage("Could not create request.", e, MessageType.ERROR);
-              // this should never happen if used correctly
-            }
+            if (files != null && files.length > 0) {
+                for (File file : files) {
+                    PageElement pageElem = new PageElement();
+                    pageElem.setContentType("image/png");
+                    pageElem.setFilename(file.getName());
+                    pageElem.setType("IMAGE");
+                    pageElem.setDownloadUrl(
+                          restEndpoint + DownloadFileController.GET_FILE_URL
+                                  .replace(
+                                          DownloadFileController.USER_NAME_PLACEHOLDER,
+                                          request.getUsername())
+                                  .replace(
+                                          DownloadFileController.UPLOAD_ID_PLACEHOLDER,
+                                          request.getUploadId())
+                                  .replace(
+                                          DownloadFileController.DOCUMENT_ID_PLACEHOLDER,
+                                          request.getDocumentId())
+                                  .replace(
+                                          DownloadFileController.PAGE_NR,
+                                          String.valueOf(request.getPageNr()))
+                                  .replace(DownloadFileController.FILENAME_PLACEHOLDER,
+                                          file.getName()));
+                    pageElem.setStatus(PageStatus.COMPLETE);
+                    requestPage.getPageElements().add(pageElem);
+                }
+                pages.add(requestPage);
+                progressManager.setPhase(ProgressPhase.WIND_DOWN);
+                ICompletionNotificationRequest completedRequest = null;
+                try {
+                  completedRequest = requestFactory.createRequest(request.getRequestId(), request.getUploadId());
+                } catch (InstantiationException | IllegalAccessException e) {
+                  messageHandler.handleMessage("Could not create request.", e, MessageType.ERROR);
+                }
 
-            completedRequest.setDocumentId(request.getDocumentId());
-            completedRequest.setFileId(request.getFileId());
-            completedRequest.setNotifier(propertiesManager.getProperty(Properties.NOTIFIER_ID));
-            completedRequest.setStatus(status);
-            completedRequest.setExtractionDate(OffsetDateTime.now(ZoneId.of("UTC")).toString());
-            completedRequest.setPages(pages);
-            completedRequest.setImageExtracted(true);
-            completedRequest.setContentType("image/png");
-            progressManager.setPhase(ProgressPhase.DONE);
-            try {
-              requestProducer.sendRequest(completedRequest,
-                      propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
-            } catch (MessageCreationException e) {
-              messageHandler.handleMessage("Could not send message.", e, MessageType.ERROR);
+                completedRequest.setDocumentId(request.getDocumentId());
+                completedRequest.setFileId(request.getFileId());
+                completedRequest.setNotifier(propertiesManager.getProperty(Properties.NOTIFIER_ID));
+                completedRequest.setStatus(status);
+                completedRequest.setExtractionDate(OffsetDateTime.now(ZoneId.of("UTC")).toString());
+                completedRequest.setPages(pages);
+                completedRequest.setImageExtracted(true);
+                completedRequest.setContentType("image/png");
+                progressManager.setPhase(ProgressPhase.DONE);
+                try {
+                  requestProducer.sendRequest(completedRequest,
+                          propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
+                } catch (MessageCreationException e) {
+                  messageHandler.handleMessage("Could not send message.", e, MessageType.ERROR);
+                }
+                progressManager.reset();
+
+            } else {
+                fileService.deleteEmptyPageNrFolder(request.getUsername(), request.getUploadId(), request.getDocumentId(), request.getPageNr());
             }
-          
-            progressManager.reset();
         } catch (IOException e) {
             messageHandler.handleMessage("Could execute docker command for " + request.getDownloadPath(), e, MessageType.ERROR);
-        }
+        } 
     }
 }

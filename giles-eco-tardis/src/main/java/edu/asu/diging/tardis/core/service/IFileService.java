@@ -10,4 +10,6 @@ public interface IFileService {
 
     public void deleteFile(String userName, String uploadId, String documentId, int pageNr, String filename);
 
+    void deleteEmptyPageNrFolder(String userName, String uploadId, String documentId, int pageNr);
+
 }

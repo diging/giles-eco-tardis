@@ -38,4 +38,10 @@ public class FileService implements IFileService {
         fileStorageManager.deleteExtractedFile(userName, uploadId, documentId, pageNr, filename, true);
     }
     
+    @Override
+    public void deleteEmptyPageNrFolder(String userName, String uploadId, String documentId, int pageNr) {
+        String folderPath = fileStorageManager.getAndCreateStoragePath(userName, uploadId, documentId);
+        fileStorageManager.deletePageNrFolder(folderPath, pageNr, true);
+    }
+    
 }
