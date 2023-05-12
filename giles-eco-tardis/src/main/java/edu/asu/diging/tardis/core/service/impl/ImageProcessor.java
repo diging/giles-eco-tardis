@@ -3,7 +3,6 @@ package edu.asu.diging.tardis.core.service.impl;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -19,7 +18,6 @@ public class ImageProcessor {
     
     protected String saveImageFile(BufferedImage imageFile, ICompletedStorageRequest request) throws IOException {
         String filename = request.getFilename();
-        System.out.println(dirFolder);
         File file = new File(dirFolder + File.separator + filename);
         ImageIO.write(imageFile,"PNG", file);
 

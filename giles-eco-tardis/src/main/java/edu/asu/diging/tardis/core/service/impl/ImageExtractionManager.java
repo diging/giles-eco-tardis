@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import edu.asu.diging.gilesecosystem.requests.FileType;
 import edu.asu.diging.gilesecosystem.requests.ICompletedStorageRequest;
 import edu.asu.diging.gilesecosystem.requests.ICompletionNotificationRequest;
 import edu.asu.diging.gilesecosystem.requests.IRequestFactory;
@@ -83,17 +82,8 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
         requestFactory.config(CompletionNotificationRequest.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see edu.asu.diging.gilesecosystem.cepheus.service.pdf.impl.
-     * IImageExtractionManager #extractImages(edu.asu.diging.gilesecosystem.requests
-     * .IImageExtractionRequest)
-     */
     @Override
     public void extractImages(ICompletedStorageRequest request) {
-        System.out.println(request.getFilename());
-        System.out.println(request.getImageExtracted());
         if (request.getImageExtracted()) {
             return;
         }
@@ -118,8 +108,6 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             outputParentFolderPath = path.getParent().toString() + File.separator + "extracted" + File.separator + request.getPageNr() + File.separator + "extracted";
             File outputDirectory = new File(outputParentFolderPath);
             File[] files = outputDirectory.listFiles();
-            System.out.println(outputDirectory);
-            System.out.println(files);
             String restEndpoint = getRestEndpoint();
             List<edu.asu.diging.gilesecosystem.requests.impl.Page> pages = new ArrayList<>();
             edu.asu.diging.gilesecosystem.requests.impl.Page requestPage = new edu.asu.diging.gilesecosystem.requests.impl.Page();
@@ -177,7 +165,7 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
                 progressManager.reset();
 
             } else {
-                fileService.deleteEmptyPageNrFolder(request.getUsername(), request.getUploadId(), request.getDocumentId(), request.getPageNr());
+                fileService.deleteFile(request.getUsername(), request.getUploadId(), request.getDocumentId(), request.getPageNr(), null);
             }
         } catch (IOException e) {
             messageHandler.handleMessage("Could execute docker command for " + request.getDownloadPath(), e, MessageType.ERROR);
