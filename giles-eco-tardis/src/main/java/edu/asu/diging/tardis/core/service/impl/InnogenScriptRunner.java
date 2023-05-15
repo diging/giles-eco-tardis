@@ -19,7 +19,7 @@ import edu.asu.diging.tardis.core.service.IInnogenScriptRunner;
 public class InnogenScriptRunner implements IInnogenScriptRunner{
     
     @Autowired
-    private ISystemMessageHandler messageHandler;
+    protected ISystemMessageHandler messageHandler;
     
     @Autowired
     protected IPropertiesManager propertiesManager;
