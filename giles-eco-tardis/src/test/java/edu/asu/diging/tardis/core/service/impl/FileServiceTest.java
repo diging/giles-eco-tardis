@@ -29,7 +29,7 @@ public class FileServiceTest {
     
     @Test
     public void test_deleteFile_success() {
-        factoryToTest.getFileContent("github_37469232", "UPPzI36a0QHiRF", "DOCYe3yl6zWuYFX", 1, "HW3-DiyaBiju.pdf.1.tiff");
+        factoryToTest.deleteFile("github_37469232", "UPPzI36a0QHiRF", "DOCYe3yl6zWuYFX", 1, "HW3-DiyaBiju.pdf.1.tiff");
         Mockito.verify(fileStorageManager, Mockito.times(1)).deleteExtractedFile("github_37469232", "UPPzI36a0QHiRF", "DOCYe3yl6zWuYFX", 1, "HW3-DiyaBiju.pdf.1.tiff", true);
     }
 }
