@@ -6,9 +6,12 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.springframework.stereotype.Component;
+
 import edu.asu.diging.gilesecosystem.requests.ICompletedStorageRequest;
 import edu.asu.diging.gilesecosystem.util.files.IFileStorageManager;
 
+@Component
 public class ImageProcessor {
     private String dirFolder;
     

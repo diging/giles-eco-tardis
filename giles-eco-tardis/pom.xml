@@ -33,7 +33,6 @@
         <files.base.directory>/Users/diyabiju/Desktop/Dig/giles-eco-tardis/data</files.base.directory>
         <docker.path>/usr/local/bin/docker</docker.path>
         <file.folder>files</file.folder>
-        <giles.file.images.dir>/Users/diyabiju/Desktop/Dig/Giles/uploaded</giles.file.images.dir>
         
         <kafka.hosts>localhost:9092</kafka.hosts>
 
@@ -112,7 +111,11 @@
             <artifactId>mockito-core</artifactId>
             <version>2.28.2</version>
         </dependency>
-    	
+    	<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${org.springframework-version}</version>
+        </dependency>
         <!-- Spring Security -->
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -322,6 +325,10 @@
                     <exclude>**/*.woff2</exclude>
                 </excludes>
             </resource>
+            <resource>
+            	<directory>src/test/resources</directory>
+            	<filtering>true</filtering>
+        	</resource>
         </resources>
         <plugins>
             <plugin>

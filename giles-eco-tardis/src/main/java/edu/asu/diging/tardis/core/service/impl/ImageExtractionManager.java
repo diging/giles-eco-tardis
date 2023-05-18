@@ -13,11 +13,14 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import edu.asu.diging.gilesecosystem.requests.ICompletedStorageRequest;
 import edu.asu.diging.gilesecosystem.requests.ICompletionNotificationRequest;
@@ -69,6 +72,13 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
     @Autowired
     private IFileService fileService;
     
+    @Autowired
+    private ImageProcessor imageProcessor;
+    
+    @Inject
+    @Named("restTemplate")
+    private RestTemplate restTemplate;
+    
     @PostConstruct
     public void init() {
         /*
@@ -93,21 +103,22 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
         BufferedImage imageFile = null;
         RequestStatus status = RequestStatus.COMPLETE;
         try {
-            imageFile = ImageIO.read((new ByteArrayInputStream(downloadFile(request.getDownloadUrl()))));
+            imageFile = ImageIO.read((new ByteArrayInputStream(downloadFile(request.getDownloadUrl(), restTemplate))));
             
         } catch (IOException e) {
             messageHandler.handleMessage("Could get Image for " + request.getDownloadPath(), e, MessageType.ERROR);
             status = RequestStatus.FAILED;
         }
-        ImageProcessor processor = new ImageProcessor(fileStorageManager, request);
         String imagePath, outputParentFolderPath;
         try {
-            imagePath = processor.saveImageFile(imageFile, request);
+            imagePath = imageProcessor.saveImageFile(imageFile, request);
             innogenScriptRunner.runInnogenScript(imagePath,request.getPageNr());
             Path path = Paths.get(imagePath);
             outputParentFolderPath = path.getParent().toString() + File.separator + "extracted" + File.separator + request.getPageNr() + File.separator + "extracted";
+            System.out.println(outputParentFolderPath);
             File outputDirectory = new File(outputParentFolderPath);
             File[] files = outputDirectory.listFiles();
+            System.out.println(files);
             String restEndpoint = getRestEndpoint();
             List<edu.asu.diging.gilesecosystem.requests.impl.Page> pages = new ArrayList<>();
             edu.asu.diging.gilesecosystem.requests.impl.Page requestPage = new edu.asu.diging.gilesecosystem.requests.impl.Page();
