@@ -29,9 +29,9 @@
         <db.user></db.user>
         <db.password></db.password>
         <db.dialect>org.hibernate.dialect.MySQL57Dialect</db.dialect>
-        <app.url>http://localhost:8088/tardis</app.url>
-        <files.base.directory>/Users/diyabiju/Desktop/Dig/giles-eco-tardis/data</files.base.directory>
-        <docker.path>/usr/local/bin/docker</docker.path>
+        <app.url></app.url>
+        <files.base.directory></files.base.directory>
+        <docker.path></docker.path>
         <file.folder>files</file.folder>
         
         <kafka.hosts>localhost:9092</kafka.hosts>
@@ -325,10 +325,6 @@
                     <exclude>**/*.woff2</exclude>
                 </excludes>
             </resource>
-            <resource>
-            	<directory>src/test/resources</directory>
-            	<filtering>true</filtering>
-        	</resource>
         </resources>
         <plugins>
             <plugin>
