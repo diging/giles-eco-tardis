@@ -33,7 +33,6 @@ import edu.asu.diging.gilesecosystem.requests.impl.PageElement;
 import edu.asu.diging.gilesecosystem.requests.kafka.IRequestProducer;
 import edu.asu.diging.gilesecosystem.septemberutil.properties.MessageType;
 import edu.asu.diging.gilesecosystem.septemberutil.service.ISystemMessageHandler;
-import edu.asu.diging.gilesecosystem.util.files.IFileStorageManager;
 import edu.asu.diging.gilesecosystem.util.properties.IPropertiesManager;
 import edu.asu.diging.tardis.api.DownloadFileController;
 import edu.asu.diging.tardis.config.Properties;
@@ -53,9 +52,6 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
 
     @Autowired
     private ISystemMessageHandler messageHandler;
-
-    @Autowired
-    private IFileStorageManager fileStorageManager;
 
     @Autowired
     private IRequestFactory<ICompletionNotificationRequest, CompletionNotificationRequest> requestFactory;
@@ -115,10 +111,8 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             innogenScriptRunner.runInnogenScript(imagePath,request.getPageNr());
             Path path = Paths.get(imagePath);
             outputParentFolderPath = path.getParent().toString() + File.separator + "extracted" + File.separator + request.getPageNr() + File.separator + "extracted";
-            System.out.println(outputParentFolderPath);
             File outputDirectory = new File(outputParentFolderPath);
             File[] files = outputDirectory.listFiles();
-            System.out.println(files);
             String restEndpoint = getRestEndpoint();
             List<edu.asu.diging.gilesecosystem.requests.impl.Page> pages = new ArrayList<>();
             edu.asu.diging.gilesecosystem.requests.impl.Page requestPage = new edu.asu.diging.gilesecosystem.requests.impl.Page();

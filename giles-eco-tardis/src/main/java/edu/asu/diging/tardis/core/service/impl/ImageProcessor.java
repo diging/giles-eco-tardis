@@ -6,20 +6,22 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.gilesecosystem.requests.ICompletedStorageRequest;
 import edu.asu.diging.gilesecosystem.util.files.IFileStorageManager;
+import edu.asu.diging.tardis.core.service.IImageProcessor;
 
 @Component
-public class ImageProcessor {
-    private String dirFolder;
+public class ImageProcessor implements IImageProcessor {
     
-    public ImageProcessor(IFileStorageManager storageManager, ICompletedStorageRequest request) {
-        dirFolder = storageManager.getAndCreateStoragePath(request.getUsername(), request.getUploadId(), request.getDocumentId());
-    }
+    @Autowired
+    private IFileStorageManager storageManager;
     
-    protected String saveImageFile(BufferedImage imageFile, ICompletedStorageRequest request) throws IOException {
+    @Override
+    public String saveImageFile(BufferedImage imageFile, ICompletedStorageRequest request) throws IOException {
+        String dirFolder = storageManager.getAndCreateStoragePath(request.getUsername(), request.getUploadId(), request.getDocumentId());
         String filename = request.getFilename();
         File file = new File(dirFolder + File.separator + filename);
         ImageIO.write(imageFile,"PNG", file);

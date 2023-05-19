@@ -6,10 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +37,7 @@ public class AExtractionManager {
     @Autowired
     protected IPropertiesManager propertiesManager;
 
-
     public byte[] downloadFile(String url, RestTemplate restTemplate) {
-        //restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new ByteArrayHttpMessageConverter());
 
         HttpHeaders headers = new HttpHeaders();

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import edu.asu.diging.gilesecosystem.septemberutil.service.ISystemMessageHandler;
@@ -61,5 +62,10 @@ public class RootConfig {
         storageManager.setBaseDirectory(baseDirectory);
         storageManager.setFileTypeFolder(fileFolder);
         return storageManager;
+    }
+    
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
