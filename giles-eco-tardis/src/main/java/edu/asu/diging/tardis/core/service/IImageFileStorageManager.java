@@ -5,6 +5,6 @@ import java.io.IOException;
 
 import edu.asu.diging.gilesecosystem.requests.ICompletedStorageRequest;
 
-public interface IImageProcessor {
+public interface IImageFileStorageManager {
     public String saveImageFile(BufferedImage imageFile, ICompletedStorageRequest request) throws IOException;
 }

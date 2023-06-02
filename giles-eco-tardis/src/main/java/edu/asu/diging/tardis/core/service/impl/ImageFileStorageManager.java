@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
 
 import edu.asu.diging.gilesecosystem.requests.ICompletedStorageRequest;
 import edu.asu.diging.gilesecosystem.util.files.IFileStorageManager;
-import edu.asu.diging.tardis.core.service.IImageProcessor;
+import edu.asu.diging.tardis.core.service.IImageFileStorageManager;
 
 @Component
-public class ImageProcessor implements IImageProcessor {
+public class ImageFileStorageManager implements IImageFileStorageManager {
     
     @Autowired
     private IFileStorageManager storageManager;

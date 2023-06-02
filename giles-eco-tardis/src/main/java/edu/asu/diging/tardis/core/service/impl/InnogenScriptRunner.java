@@ -13,6 +13,7 @@ import edu.asu.diging.gilesecosystem.septemberutil.properties.MessageType;
 import edu.asu.diging.gilesecosystem.septemberutil.service.ISystemMessageHandler;
 import edu.asu.diging.gilesecosystem.util.properties.IPropertiesManager;
 import edu.asu.diging.tardis.config.Properties;
+import edu.asu.diging.tardis.core.exception.InnogenScriptRunnerException;
 import edu.asu.diging.tardis.core.service.IInnogenScriptRunner;
 
 @Service
@@ -25,7 +26,7 @@ public class InnogenScriptRunner implements IInnogenScriptRunner{
     protected IPropertiesManager propertiesManager;
     
     @Override
-    public void runInnogenScript(String imagePath, int pareNr) {
+    public void runInnogenScript(String imagePath, int pareNr) throws InnogenScriptRunnerException {
         Path path = Paths.get(imagePath);
         String outputParentFolderPath = path.getParent().toString();
         String outputDirectory = getOutputDirectoryForImage(outputParentFolderPath, pareNr);
@@ -45,6 +46,7 @@ public class InnogenScriptRunner implements IInnogenScriptRunner{
             process.waitFor();
         } catch (IOException | InterruptedException e) {
             messageHandler.handleMessage("Could not execute docker command for " + imagePath, e, MessageType.ERROR);
+            throw new InnogenScriptRunnerException("Could not execute docker command for " + imagePath);
         }
     }
     

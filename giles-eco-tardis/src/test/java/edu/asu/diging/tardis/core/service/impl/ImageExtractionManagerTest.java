@@ -29,6 +29,7 @@ import edu.asu.diging.gilesecosystem.util.files.IFileStorageManager;
 import edu.asu.diging.gilesecosystem.util.properties.IPropertiesManager;
 import edu.asu.diging.tardis.config.Properties;
 import edu.asu.diging.tardis.core.service.IFileService;
+import edu.asu.diging.tardis.core.service.IImageFileStorageManager;
 import edu.asu.diging.tardis.core.service.IInnogenScriptRunner;
 import edu.asu.diging.tardis.core.service.IProgressManager;
 
@@ -58,7 +59,7 @@ public class ImageExtractionManagerTest {
     private IFileService fileService;
     
     @Mock
-    private ImageProcessor processor;
+    private IImageFileStorageManager imageFileStorageManager;
     
     @Mock
     private File outputDirectoryMock;
@@ -84,8 +85,9 @@ public class ImageExtractionManagerTest {
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(imageExtractionManager, "restTemplate", restTemplateMock);
         iCompletedStorageRequest = createICompletedStorageRequest(1);
-        Mockito.when(processor.saveImageFile(Mockito.any(BufferedImage.class), Mockito.any(ICompletedStorageRequest.class))).thenReturn("files/github_37469232/UPPzI36a0QHiRF/DOCYe3yl6zWuYFX/HW3-DiyaBiju.pdf.1.tiff");
+        Mockito.when(imageFileStorageManager.saveImageFile(Mockito.any(BufferedImage.class), Mockito.any(ICompletedStorageRequest.class))).thenReturn("files/github_37469232/UPPzI36a0QHiRF/DOCYe3yl6zWuYFX/HW3-DiyaBiju.pdf.1.tiff");
         Mockito.when(propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION)).thenReturn("topic_completion_notification");
+        Mockito.when(propertiesManager.getProperty(Properties.EXTRACTED_FOLDER)).thenReturn("extracted");
         byte[] mockImage = new byte[10];
         ResponseEntity<byte[]> mockResponse = new ResponseEntity<>(mockImage, HttpStatus.OK);
         Mockito.when(restTemplateMock.exchange(Mockito.anyString(), Mockito.eq(HttpMethod.GET), Mockito.any(HttpEntity.class), Mockito.eq(byte[].class)))
@@ -100,14 +102,14 @@ public class ImageExtractionManagerTest {
     
     
     @Test
-    public void test_extractImages_whenGetImageExtractedIsFalse_success() throws MessageCreationException {
+    public void test_extractImages_whenIsImageExtractedIsFalse_success() throws MessageCreationException {
         imageExtractionManager.extractImages(iCompletedStorageRequest);
         Mockito.verify(requestProducer, Mockito.times(1)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
         cleanUpFiles();
     }
     
     @Test
-    public void test_extractImages_whenGetImageExtractedIsTrue_success() throws MessageCreationException {
+    public void test_extractImages_whenIsImageExtractedIsTrue_success() throws MessageCreationException {
         iCompletedStorageRequest.setImageExtracted(true);
         imageExtractionManager.extractImages(iCompletedStorageRequest);
         Mockito.verify(requestProducer, Mockito.times(0)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));

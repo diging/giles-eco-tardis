@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import edu.asu.diging.gilesecosystem.util.files.IFileStorageManager;
+import junit.framework.Assert;
 
 public class FileServiceTest {
     @Mock
@@ -23,7 +24,10 @@ public class FileServiceTest {
     
     @Test
     public void test_getFileContent_success() {
-        factoryToTest.getFileContent("github_37469232", "UPPzI36a0QHiRF", "DOCYe3yl6zWuYFX", 1, "HW3-DiyaBiju.pdf.1.tiff");
+        byte[] expectedResult = new byte[0];
+        Mockito.when(fileStorageManager.getExtractedFileContent(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyString())).thenReturn(expectedResult);
+        byte[] result = factoryToTest.getFileContent("github_37469232", "UPPzI36a0QHiRF", "DOCYe3yl6zWuYFX", 1, "HW3-DiyaBiju.pdf.1.tiff");
+        Assert.assertEquals(expectedResult, result);
         Mockito.verify(fileStorageManager, Mockito.times(1)).getExtractedFileContent("github_37469232", "UPPzI36a0QHiRF", "DOCYe3yl6zWuYFX", 1, "HW3-DiyaBiju.pdf.1.tiff");
     }
     
