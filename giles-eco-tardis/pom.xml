@@ -12,7 +12,6 @@
         <spring-security-version>5.1.5.RELEASE</spring-security-version>
         <spring-data.version>Lovelace-RELEASE</spring-data.version>
         <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
-        <java-version>1.8</java-version>
         <geco.requests.version>0.14-SNAPSHOT</geco.requests.version>
         <geco.util.version>0.7-SNAPSHOT</geco.util.version>
         <geco.september.util.version>0.3</geco.september.util.version>
@@ -25,11 +24,11 @@
 
         
         <db.driver>com.mysql.jdbc.Driver</db.driver>
-        <db.database.url></db.database.url>
-        <db.user></db.user>
-        <db.password></db.password>
+        <db.database.url>jdbc:mysql://localhost:3306/tardis?serverTimezone=GMT</db.database.url>
+        <db.user>apps</db.user>
+        <db.password>apps</db.password>
         <db.dialect>org.hibernate.dialect.MySQL57Dialect</db.dialect>
-        <app.url></app.url>
+        <app.url>http://localhost:8090/tardis</app.url>
         <files.base.directory></files.base.directory>
         <docker.path></docker.path>
         <file.folder>files</file.folder>

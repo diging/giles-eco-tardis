@@ -105,12 +105,11 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             messageHandler.handleMessage("Could get Image for " + request.getDownloadPath(), e, MessageType.ERROR);
             status = RequestStatus.FAILED;
         }
-        String imagePath, outputParentFolderPath;
         try {
-            imagePath = imageProcessor.saveImageFile(imageFile, request);
+            String imagePath = imageProcessor.saveImageFile(imageFile, request);
             innogenScriptRunner.runInnogenScript(imagePath,request.getPageNr());
             Path path = Paths.get(imagePath);
-            outputParentFolderPath = path.getParent().toString() + File.separator + "extracted" + File.separator + request.getPageNr() + File.separator + "extracted";
+            String outputParentFolderPath = path.getParent().toString() + File.separator + "extracted" + File.separator + request.getPageNr() + File.separator + "extracted";
             File outputDirectory = new File(outputParentFolderPath);
             File[] files = outputDirectory.listFiles();
             String restEndpoint = getRestEndpoint();
