@@ -92,7 +92,7 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
 
     @Override
     public void extractImages(ICompletedStorageRequest request) {
-        if (request.isImageExtracted()) {
+        if (request.isDerivedFile()) {
             return;
         }
         
@@ -158,7 +158,7 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             completedRequest.setStatus(status);
             completedRequest.setExtractionDate(OffsetDateTime.now(ZoneId.of("UTC")).toString());
             completedRequest.setPages(pages);
-            completedRequest.setImageExtracted(true);
+            completedRequest.setDerivedFile(true);
             completedRequest.setContentType("image/png");
             progressManager.setPhase(ProgressPhase.DONE);
             try {

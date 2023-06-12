@@ -40,7 +40,7 @@ public class TardisKafkaConfig implements KafkaConfig {
         props.put(ConsumerConfig.CLIENT_ID_CONFIG, "geco.consumer.tardis." + new Random().nextInt(100));
         // consumer groups allow a pool of processes to divide the work of
         // consuming and processing records
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "gileseco.pdf.image.processing");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "gileseco.innogen.image.processing");
 
         return props;
     }
