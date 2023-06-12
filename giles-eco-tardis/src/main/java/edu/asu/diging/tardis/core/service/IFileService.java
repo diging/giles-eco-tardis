@@ -1,5 +1,7 @@
 package edu.asu.diging.tardis.core.service;
 
+import java.io.IOException;
+
 import edu.asu.diging.gilesecosystem.requests.ICompletedStorageRequest;
 /**
  * This class handles file deletion, storage path retrieval and getting the file content
@@ -21,8 +23,9 @@ public interface IFileService {
     @param pageNr The page number within the document where the file is located.
     @param filename The name of the file to retrieve.
     @return The content of the file as a byte array.
+     * @throws IOException 
     */
-    byte[] getFileContent(String userName, String uploadId, String documentId, int pageNr, String filename);
+    byte[] getFileContent(String userName, String uploadId, String documentId, int pageNr, String filename) throws IOException;
     
     /**
 

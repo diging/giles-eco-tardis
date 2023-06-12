@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.asu.diging.gilesecosystem.septemberutil.properties.MessageType;
+import edu.asu.diging.gilesecosystem.septemberutil.service.ISystemMessageHandler;
 import edu.asu.diging.tardis.core.service.IFileService;
 
 @RestController
@@ -31,6 +33,9 @@ public class DownloadFileController {
    
     @Autowired
     private IFileService fileService;
+    
+    @Autowired
+    private ISystemMessageHandler messageHandler;
 
     @RequestMapping(value = GET_FILE_URL)
     public ResponseEntity<String> getFile(
@@ -38,7 +43,13 @@ public class DownloadFileController {
             HttpServletResponse response,
             HttpServletRequest request) {
 
-        byte[] content = fileService.getFileContent(userName, uploadId, documentId, pageNr, filename);
+        byte[] content;
+        try {
+            content = fileService.getFileContent(userName, uploadId, documentId, pageNr, filename);
+        } catch (IOException e) {
+            messageHandler.handleMessage("Could not read the extracted file.", e, MessageType.ERROR);
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         
         if (content == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
