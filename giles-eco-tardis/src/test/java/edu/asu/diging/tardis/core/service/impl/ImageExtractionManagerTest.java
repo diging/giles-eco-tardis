@@ -110,7 +110,7 @@ public class ImageExtractionManagerTest {
     
     @Test
     public void test_extractImages_whenIsImageExtractedIsTrue_success() throws MessageCreationException {
-        iCompletedStorageRequest.setImageExtracted(true);
+        iCompletedStorageRequest.setDerivedFile(true);
         imageExtractionManager.extractImages(iCompletedStorageRequest);
         Mockito.verify(requestProducer, Mockito.times(0)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
         cleanUpFiles();
@@ -133,7 +133,7 @@ public class ImageExtractionManagerTest {
         iCompletedStorageRequest.setUploadId("UPPzI36a0QHiRF");
         iCompletedStorageRequest.setPageNr(pageNr);
         iCompletedStorageRequest.setRequestId("REQ12345");
-        iCompletedStorageRequest.setImageExtracted(false);
+        iCompletedStorageRequest.setDerivedFile(false);
         return iCompletedStorageRequest;
     }
     
