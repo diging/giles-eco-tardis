@@ -2,7 +2,7 @@ package edu.asu.diging.tardis.core.exception;
 
 public class InnogenScriptRunnerException extends Exception {
 
-    private static final long serialVersionUID = 2353695957253007231L;
+    private static final long serialVersionUID = 1;
     
     public InnogenScriptRunnerException() {
         super();

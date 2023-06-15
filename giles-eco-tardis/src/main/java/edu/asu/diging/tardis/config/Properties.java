@@ -29,8 +29,7 @@ public interface Properties {
     
     public final static String APP_URL = "app_url";
     public final static String NOTIFIER_ID = "tardis_notifier_id";
-    
-    public final static String GILES_IMAGES_DIRECTORY = "giles.file.images.dir";
+
     public final static String BASE_DIRECTORY = "base_directory";
     public final static String DOCKER_PATH = "docker_path";
     public final static String EXTRACTED_FOLDER = "extracted_folder";

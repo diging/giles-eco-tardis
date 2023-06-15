@@ -44,7 +44,7 @@ public class RequestReceiver {
             manager.extractImages(request);
         } else {
             // otherwise do nothing (we only care about image files)
-            logger.info("File not an image. Skip processing.");
+            logger.debug("File not an image. Skip processing.");
         } 
     }
 }

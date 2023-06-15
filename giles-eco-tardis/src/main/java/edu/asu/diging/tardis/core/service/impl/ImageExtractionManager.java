@@ -34,7 +34,7 @@ import edu.asu.diging.gilesecosystem.requests.kafka.IRequestProducer;
 import edu.asu.diging.gilesecosystem.septemberutil.properties.MessageType;
 import edu.asu.diging.gilesecosystem.septemberutil.service.ISystemMessageHandler;
 import edu.asu.diging.gilesecosystem.util.properties.IPropertiesManager;
-import edu.asu.diging.tardis.api.DownloadFileController;
+import edu.asu.diging.tardis.api.v1.DownloadFileController;
 import edu.asu.diging.tardis.config.Properties;
 import edu.asu.diging.tardis.core.exception.InnogenScriptRunnerException;
 import edu.asu.diging.tardis.core.service.IFileService;
@@ -92,6 +92,7 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
 
     @Override
     public void extractImages(ICompletedStorageRequest request) {
+        // if the image is already extracted by services like imogen or tardis itself we can skip porcessing.
         if (request.isDerivedFile()) {
             return;
         }

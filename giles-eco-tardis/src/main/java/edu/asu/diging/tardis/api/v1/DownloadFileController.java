@@ -1,4 +1,4 @@
-package edu.asu.diging.tardis.api;
+package edu.asu.diging.tardis.api.v1;
 
 import java.io.IOException;
 
@@ -21,7 +21,6 @@ import edu.asu.diging.tardis.core.service.IFileService;
 
 @RestController
 public class DownloadFileController {
-    
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
     public final static String FILENAME_PLACEHOLDER = "{filename:.+}";
@@ -29,7 +28,7 @@ public class DownloadFileController {
     public final static String USER_NAME_PLACEHOLDER = "{userName}";
     public final static String UPLOAD_ID_PLACEHOLDER = "{uploadId}";
     public final static String PAGE_NR = "{pageNr}";
-    public final static String GET_FILE_URL = "/rest/image/" + USER_NAME_PLACEHOLDER + "/" + UPLOAD_ID_PLACEHOLDER + "/" + DOCUMENT_ID_PLACEHOLDER + "/" + PAGE_NR + "/" + FILENAME_PLACEHOLDER;
+    public final static String GET_FILE_URL = "/api/v1/image/" + USER_NAME_PLACEHOLDER + "/" + UPLOAD_ID_PLACEHOLDER + "/" + DOCUMENT_ID_PLACEHOLDER + "/" + PAGE_NR + "/" + FILENAME_PLACEHOLDER;
    
     @Autowired
     private IFileService fileService;
