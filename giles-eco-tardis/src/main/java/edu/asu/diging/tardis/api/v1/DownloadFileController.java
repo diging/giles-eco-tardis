@@ -27,8 +27,8 @@ public class DownloadFileController {
     public final static String DOCUMENT_ID_PLACEHOLDER = "{documentId}";
     public final static String USER_NAME_PLACEHOLDER = "{userName}";
     public final static String UPLOAD_ID_PLACEHOLDER = "{uploadId}";
-    public final static String PAGE_NR = "{pageNr}";
-    public final static String GET_FILE_URL = "/api/v1/image/" + USER_NAME_PLACEHOLDER + "/" + UPLOAD_ID_PLACEHOLDER + "/" + DOCUMENT_ID_PLACEHOLDER + "/" + PAGE_NR + "/" + FILENAME_PLACEHOLDER;
+    public final static String UNIQUE_FOLDER = "{uniqueFolder}";
+    public final static String GET_FILE_URL = "/api/v1/image/" + USER_NAME_PLACEHOLDER + "/" + UPLOAD_ID_PLACEHOLDER + "/" + DOCUMENT_ID_PLACEHOLDER + "/" + UNIQUE_FOLDER + "/" + FILENAME_PLACEHOLDER;
    
     @Autowired
     private IFileService fileService;
@@ -38,27 +38,23 @@ public class DownloadFileController {
 
     @RequestMapping(value = GET_FILE_URL)
     public ResponseEntity<String> getFile(
-            @PathVariable String filename, @PathVariable String documentId, @PathVariable String uploadId, @PathVariable String userName, @PathVariable int pageNr,
+            @PathVariable String filename, @PathVariable String documentId, @PathVariable String uploadId, @PathVariable String userName, @PathVariable String uniqueFolder,
             HttpServletResponse response,
             HttpServletRequest request) {
 
         byte[] content;
         try {
-            content = fileService.getFileContent(userName, uploadId, documentId, pageNr, filename);
+            content = fileService.getFileContent(userName, uploadId, documentId, uniqueFolder, filename);
         } catch (IOException e) {
             messageHandler.handleMessage("Could not read the extracted file.", e, MessageType.ERROR);
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
         if (content == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        
-        fileService.deleteFile(userName, uploadId, documentId, pageNr, filename);
-        
+        fileService.deleteFile(userName, uploadId, documentId, uniqueFolder, filename);
         String contentType = new Tika().detect(content);
         response.setContentType(contentType);
-        
         response.setContentLength(content.length);
         response.setHeader("Content-disposition", "filename=\"" + filename + "\""); 
         try {

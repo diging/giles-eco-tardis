@@ -33,4 +33,5 @@ public interface Properties {
     public final static String BASE_DIRECTORY = "base_directory";
     public final static String DOCKER_PATH = "docker_path";
     public final static String EXTRACTED_FOLDER = "extracted_folder";
+    public final static String TARGET_FOLDER = "target_folder";
 }

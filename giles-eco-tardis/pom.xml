@@ -32,6 +32,8 @@
         <files.base.directory></files.base.directory>
         <docker.path></docker.path>
         <file.folder>files</file.folder>
+        <extracted.folder>extracted</extracted.folder>
+        <target.folder>/data</target.folder>
         
         <kafka.hosts>localhost:9092</kafka.hosts>
 

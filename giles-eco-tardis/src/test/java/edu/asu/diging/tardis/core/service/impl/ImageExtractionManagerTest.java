@@ -1,6 +1,5 @@
 package edu.asu.diging.tardis.core.service.impl;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -29,7 +28,6 @@ import edu.asu.diging.gilesecosystem.util.files.IFileStorageManager;
 import edu.asu.diging.gilesecosystem.util.properties.IPropertiesManager;
 import edu.asu.diging.tardis.config.Properties;
 import edu.asu.diging.tardis.core.service.IFileService;
-import edu.asu.diging.tardis.core.service.IImageFileStorageManager;
 import edu.asu.diging.tardis.core.service.IInnogenScriptRunner;
 import edu.asu.diging.tardis.core.service.IProgressManager;
 
@@ -59,9 +57,6 @@ public class ImageExtractionManagerTest {
     private IFileService fileService;
     
     @Mock
-    private IImageFileStorageManager imageFileStorageManager;
-    
-    @Mock
     private File outputDirectoryMock;
     
     @Mock
@@ -85,7 +80,6 @@ public class ImageExtractionManagerTest {
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(imageExtractionManager, "restTemplate", restTemplateMock);
         iCompletedStorageRequest = createICompletedStorageRequest(1);
-        Mockito.when(imageFileStorageManager.saveImageFile(Mockito.any(BufferedImage.class), Mockito.any(ICompletedStorageRequest.class))).thenReturn("files/github_37469232/UPPzI36a0QHiRF/DOCYe3yl6zWuYFX/HW3-DiyaBiju.pdf.1.tiff");
         Mockito.when(propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION)).thenReturn("topic_completion_notification");
         Mockito.when(propertiesManager.getProperty(Properties.EXTRACTED_FOLDER)).thenReturn("extracted");
         byte[] mockImage = new byte[10];
@@ -120,7 +114,6 @@ public class ImageExtractionManagerTest {
     public void test_extractImages_whenThereAreNoExtractedImages_success() throws MessageCreationException {
         cleanUpFiles();
         imageExtractionManager.extractImages(iCompletedStorageRequest);
-        Mockito.verify(fileService, Mockito.times(1)).deleteFile(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyString());
     }
     
     private ICompletedStorageRequest createICompletedStorageRequest(int pageNr) {
