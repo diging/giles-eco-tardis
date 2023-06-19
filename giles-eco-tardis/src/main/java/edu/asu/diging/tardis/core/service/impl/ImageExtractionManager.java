@@ -108,7 +108,6 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             sendCompletionRequest(request, RequestStatus.FAILED);
             return;
         }
-        System.out.println(imagePath);
         String uniqueFolder;
         try {
             uniqueFolder = innogenScriptRunner.runInnogenScript(imagePath);
@@ -119,7 +118,6 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
         }
         Path path = Paths.get(imagePath);
         String outputParentFolderPath = path.getParent().toString() + File.separator + propertiesManager.getProperty(Properties.EXTRACTED_FOLDER) + File.separator + uniqueFolder + File.separator + propertiesManager.getProperty(Properties.EXTRACTED_FOLDER);
-        System.out.println(outputParentFolderPath);
         File outputDirectory = new File(outputParentFolderPath);
         File[] files = outputDirectory.listFiles();
         if (files == null || files.length == 0) {
@@ -129,6 +127,7 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
         }
         for (File file : files) {
             sendCompletionRequest(request, status, file, uniqueFolder);
+            fileService.deleteFile(request.getUsername(), request.getUploadId(), request.getDocumentId(), uniqueFolder, file.getName());
         }
         progressManager.setPhase(ProgressPhase.WIND_DOWN);
         progressManager.reset();  

@@ -27,6 +27,7 @@ import edu.asu.diging.gilesecosystem.septemberutil.service.ISystemMessageHandler
 import edu.asu.diging.gilesecosystem.util.files.IFileStorageManager;
 import edu.asu.diging.gilesecosystem.util.properties.IPropertiesManager;
 import edu.asu.diging.tardis.config.Properties;
+import edu.asu.diging.tardis.core.exception.InnogenScriptRunnerException;
 import edu.asu.diging.tardis.core.service.IFileService;
 import edu.asu.diging.tardis.core.service.IInnogenScriptRunner;
 import edu.asu.diging.tardis.core.service.IProgressManager;
@@ -92,6 +93,7 @@ public class ImageExtractionManagerTest {
         completedRequest.setRequestId(iCompletedStorageRequest.getRequestId());
         completedRequest.setUploadId(iCompletedStorageRequest.getUploadId());
         Mockito.when(requestFactory.createRequest(iCompletedStorageRequest.getRequestId(), iCompletedStorageRequest.getUploadId())).thenReturn(completedRequest);
+        Mockito.when(fileService.saveImageFile(Mockito.any(), Mockito.any())).thenReturn("files/github_37469232/UPPzI36a0QHiRF/DOCYe3yl6zWuYFX/HW3-DiyaBiju.pdf.1.tiff");
     }
     
     
@@ -99,6 +101,24 @@ public class ImageExtractionManagerTest {
     public void test_extractImages_whenIsImageExtractedIsFalse_success() throws MessageCreationException {
         imageExtractionManager.extractImages(iCompletedStorageRequest);
         Mockito.verify(requestProducer, Mockito.times(1)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
+        cleanUpFiles();
+    }
+    
+    @Test
+    public void test_extractImages_whenIsImageExtractedIsFalse_throwsIOException() throws MessageCreationException, IOException {
+        Mockito.when(fileService.saveImageFile(Mockito.any(), Mockito.any())).thenThrow(IOException.class);
+        imageExtractionManager.extractImages(iCompletedStorageRequest);
+        Mockito.verify(requestProducer, Mockito.times(1)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
+        Mockito.verify(messageHandler, Mockito.times(1)).handleMessage(Mockito.anyString(), Mockito.any(IOException.class), Mockito.any());
+        cleanUpFiles();
+    }
+    
+    @Test
+    public void test_extractImages_whenIsImageExtractedIsFalse_throwsInnogenScriptRunnerException() throws MessageCreationException, InnogenScriptRunnerException {
+        Mockito.when(innogenScriptRunner.runInnogenScript(Mockito.anyString())).thenThrow(InnogenScriptRunnerException.class);
+        imageExtractionManager.extractImages(iCompletedStorageRequest);
+        Mockito.verify(requestProducer, Mockito.times(1)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
+        Mockito.verify(messageHandler, Mockito.times(1)).handleMessage(Mockito.anyString(), Mockito.any(IOException.class), Mockito.any());
         cleanUpFiles();
     }
     
@@ -114,6 +134,7 @@ public class ImageExtractionManagerTest {
     public void test_extractImages_whenThereAreNoExtractedImages_success() throws MessageCreationException {
         cleanUpFiles();
         imageExtractionManager.extractImages(iCompletedStorageRequest);
+        Mockito.verify(requestProducer, Mockito.times(1)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
     }
     
     private ICompletedStorageRequest createICompletedStorageRequest(int pageNr) {
@@ -124,7 +145,6 @@ public class ImageExtractionManagerTest {
         iCompletedStorageRequest.setUsername("github_37469232");
         iCompletedStorageRequest.setFilename("HW3-DiyaBiju.pdf.1.tiff");
         iCompletedStorageRequest.setUploadId("UPPzI36a0QHiRF");
-        iCompletedStorageRequest.setPageNr(pageNr);
         iCompletedStorageRequest.setRequestId("REQ12345");
         iCompletedStorageRequest.setDerivedFile(false);
         return iCompletedStorageRequest;

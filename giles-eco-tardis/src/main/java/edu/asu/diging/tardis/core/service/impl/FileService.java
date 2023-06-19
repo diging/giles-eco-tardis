@@ -49,7 +49,6 @@ public class FileService implements IFileService {
         String filename = request.getFilename();
         File file = new File(dirFolder + File.separator + filename);
         ImageIO.write(imageFile,"PNG", file);
-
         return file.getAbsolutePath();
     }
     
@@ -63,14 +62,13 @@ public class FileService implements IFileService {
             String filename, boolean deleteEmptyFolders) {
         String folderPath = fileStorageManager.getAndCreateStoragePath(username, uploadId, documentId);
         File file = new File(folderPath + File.separator + propertiesManager.getProperty(Properties.EXTRACTED_FOLDER) + File.separator + uniqueFolder + File.separator + propertiesManager.getProperty(Properties.EXTRACTED_FOLDER) + File.separator + filename);
-
         if (file.exists()) {
             file.delete();
         }
         if (deleteEmptyFolders) {
-            boolean deletedDocFolder = deleteExtractedFolderForPage(folderPath, uniqueFolder);
-            boolean deletedPageNrFolder = deletePageNrFolder(folderPath, uniqueFolder, deletedDocFolder);
-            boolean deleteExtractedFolder = deleteExtractedFolder(folderPath, deletedPageNrFolder);
+            boolean deletedDocFolder = deleteExtractedFolderForImage(folderPath, uniqueFolder);
+            boolean deletedUniqueFolder = deleteUniqueFolder(folderPath, uniqueFolder, deletedDocFolder);
+            boolean deleteExtractedFolder = deleteExtractedFolder(folderPath, deletedUniqueFolder);
             boolean deleteDownloadFolder = deleteDocumentFolder(folderPath, deleteExtractedFolder);
             deleteUploadFolder(username, uploadId, deleteDownloadFolder);
         }
@@ -78,7 +76,7 @@ public class FileService implements IFileService {
         return true;
     }
     
-    private boolean deleteExtractedFolderForPage(String folderPath, String uniqueFolder) {
+    private boolean deleteExtractedFolderForImage(String folderPath, String uniqueFolder) {
         File docFolder = new File(folderPath + File.separator + propertiesManager.getProperty(Properties.EXTRACTED_FOLDER) + File.separator + uniqueFolder + File.separator + propertiesManager.getProperty(Properties.EXTRACTED_FOLDER));
         if (docFolder.isDirectory() && docFolder.list().length == 0) {
             return docFolder.delete();
@@ -86,7 +84,7 @@ public class FileService implements IFileService {
         return !docFolder.exists();
     }
 
-    private boolean deletePageNrFolder(String folderPath, String uniqueFolder, boolean extractedFolderDeleted) {
+    private boolean deleteUniqueFolder(String folderPath, String uniqueFolder, boolean extractedFolderDeleted) {
         if (!extractedFolderDeleted) {
             return false;
         }
