@@ -37,8 +37,7 @@ public class AExtractionManager {
     @Autowired
     protected IPropertiesManager propertiesManager;
 
-    public byte[] downloadFile(String url) {
-        RestTemplate restTemplate = new RestTemplate();
+    public byte[] downloadFile(String url, RestTemplate restTemplate) {
         restTemplate.getMessageConverters().add(new ByteArrayHttpMessageConverter());
 
         HttpHeaders headers = new HttpHeaders();

@@ -12,8 +12,8 @@
         <spring-security-version>5.1.5.RELEASE</spring-security-version>
         <spring-data.version>Lovelace-RELEASE</spring-data.version>
         <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
-        <geco.requests.version>0.13</geco.requests.version>
-        <geco.util.version>0.6</geco.util.version>
+        <geco.requests.version>0.16-SNAPSHOT</geco.requests.version>
+        <geco.util.version>0.7-SNAPSHOT</geco.util.version>
         <geco.september.util.version>0.3</geco.september.util.version>
         <geco.kafka-util.version>0.2</geco.kafka-util.version>
         
@@ -29,8 +29,11 @@
         <db.password>apps</db.password>
         <db.dialect>org.hibernate.dialect.MySQL57Dialect</db.dialect>
         <app.url>http://localhost:8090/tardis</app.url>
-        <files.base.directory>/Users/jdamerow/Software/GilesEcosystem/giles-eco-tardis/data</files.base.directory>
+        <files.base.directory></files.base.directory>
+        <docker.path></docker.path>
         <file.folder>files</file.folder>
+        <extracted.folder>extracted</extracted.folder>
+        <target.folder>/data</target.folder>
         
         <kafka.hosts>localhost:9092</kafka.hosts>
 
@@ -98,13 +101,22 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
         </dependency>
-        <dependency>
+       <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.28.2</version>
+        </dependency>
+    	<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${org.springframework-version}</version>
+        </dependency>
         <!-- Spring Security -->
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -295,7 +307,11 @@
             <version>2.13.3</version>
         </dependency>
 
-
+		<dependency>
+    		<groupId>com.github.docker-java</groupId>
+    		<artifactId>docker-java</artifactId>
+    		<version>3.2.10</version>
+		</dependency>
     </dependencies>
 
     <build>
@@ -337,8 +353,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
             <plugin>
