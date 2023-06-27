@@ -89,14 +89,14 @@ public class ImageExtractionManager extends AExtractionManager implements IImage
             return;
         }
         
-        logger.info("Extracting images for: " + request.getDownloadPath());
+        logger.debug("Extracting images for: " + request.getDownloadPath());
         
         BufferedImage imageFile = null;
         RequestStatus status = RequestStatus.COMPLETE;
         try {
             imageFile = ImageIO.read((new ByteArrayInputStream(downloadFile(request.getDownloadUrl(), restTemplate))));  
         } catch (IOException e) {
-            messageHandler.handleMessage("Could get Image for " + request.getDownloadPath(), e, MessageType.ERROR);
+            messageHandler.handleMessage("Could not read Image for " + request.getDownloadPath(), e, MessageType.ERROR);
             sendCompletionRequest(request, RequestStatus.FAILED);
             return;
         }
