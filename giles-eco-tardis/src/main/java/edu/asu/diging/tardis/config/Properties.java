@@ -34,4 +34,5 @@ public interface Properties {
     public final static String DOCKER_PATH = "docker_path";
     public final static String EXTRACTED_FOLDER = "extracted_folder";
     public final static String TARGET_FOLDER = "target_folder";
+    public final static String SERVICES_FOR_TARDIS = "services_for_tardis";
 }
