@@ -94,18 +94,21 @@ public class ImageExtractionManagerTest {
         completedRequest.setUploadId(iCompletedStorageRequest.getUploadId());
         Mockito.when(requestFactory.createRequest(iCompletedStorageRequest.getRequestId(), iCompletedStorageRequest.getUploadId())).thenReturn(completedRequest);
         Mockito.when(fileService.saveImageFile(Mockito.any(), Mockito.any())).thenReturn("files/github_37469232/UPPzI36a0QHiRF/DOCYe3yl6zWuYFX/HW3-DiyaBiju.pdf.1.tiff");
+        Mockito.when(propertiesManager.getProperty(Properties.SERVICES_FOR_TARDIS)).thenReturn("geco.cepheus,geco.giles");
     }
     
     
     @Test
-    public void test_extractImages_whenIsImageExtractedIsFalse_success() throws MessageCreationException {
+    public void test_extractImages_whenFileIsGeneratedByAWhitelistedService_success() throws MessageCreationException {
+        iCompletedStorageRequest.setGeneratedByService("geco.cepheus");
         imageExtractionManager.extractImages(iCompletedStorageRequest);
         Mockito.verify(requestProducer, Mockito.times(1)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
         cleanUpFiles();
     }
     
     @Test
-    public void test_extractImages_whenIsImageExtractedIsFalse_throwsIOException() throws MessageCreationException, IOException {
+    public void test_extractImages_whenFileIsGeneratedByAWhitelistedService_throwsIOException() throws MessageCreationException, IOException {
+        iCompletedStorageRequest.setGeneratedByService("geco.cepheus");
         Mockito.when(fileService.saveImageFile(Mockito.any(), Mockito.any())).thenThrow(IOException.class);
         imageExtractionManager.extractImages(iCompletedStorageRequest);
         Mockito.verify(requestProducer, Mockito.times(1)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
@@ -114,7 +117,8 @@ public class ImageExtractionManagerTest {
     }
     
     @Test
-    public void test_extractImages_whenIsImageExtractedIsFalse_throwsInnogenScriptRunnerException() throws MessageCreationException, InnogenScriptRunnerException {
+    public void test_extractImages_whenFileIsGeneratedByAWhitelistedService_throwsInnogenScriptRunnerException() throws MessageCreationException, InnogenScriptRunnerException {
+        iCompletedStorageRequest.setGeneratedByService("geco.cepheus");
         Mockito.when(innogenScriptRunner.runInnogenScript(Mockito.anyString())).thenThrow(InnogenScriptRunnerException.class);
         imageExtractionManager.extractImages(iCompletedStorageRequest);
         Mockito.verify(requestProducer, Mockito.times(1)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
@@ -123,7 +127,8 @@ public class ImageExtractionManagerTest {
     }
     
     @Test
-    public void test_extractImages_whenIsImageExtractedIsTrue_success() throws MessageCreationException {
+    public void test_extractImages_whenFileIsNotGeneratedByAWhitelistedService_success() throws MessageCreationException {
+        iCompletedStorageRequest.setGeneratedByService("geco.tardis");
         imageExtractionManager.extractImages(iCompletedStorageRequest);
         Mockito.verify(requestProducer, Mockito.times(0)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
         cleanUpFiles();
@@ -132,6 +137,7 @@ public class ImageExtractionManagerTest {
     @Test
     public void test_extractImages_whenThereAreNoExtractedImages_success() throws MessageCreationException {
         cleanUpFiles();
+        iCompletedStorageRequest.setGeneratedByService("geco.cepheus");
         imageExtractionManager.extractImages(iCompletedStorageRequest);
         Mockito.verify(requestProducer, Mockito.times(1)).sendRequest(completedRequest, propertiesManager.getProperty(Properties.KAFKA_TOPIC_COMPLETION_NOTIFICATIION));
     }
