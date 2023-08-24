@@ -29,4 +29,10 @@ public interface Properties {
     
     public final static String APP_URL = "app_url";
     public final static String NOTIFIER_ID = "tardis_notifier_id";
+
+    public final static String BASE_DIRECTORY = "base_directory";
+    public final static String DOCKER_PATH = "docker_path";
+    public final static String EXTRACTED_FOLDER = "extracted_folder";
+    public final static String TARGET_FOLDER = "target_folder";
+    public final static String SERVICES_FOR_TARDIS = "services_for_tardis";
 }
